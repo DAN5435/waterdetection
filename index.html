@@ -1,1 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Water Monitor</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 60px; }
+    .status { font-size: 2rem; font-weight: bold; padding: 16px; border-radius: 12px; display: inline-block; }
+    .wet { background: #ffdddd; color: #b30000; }
+    .dry { background: #ddffdd; color: #006600; }
+  </style>
+</head>
+<body>
+  <h1>ESP8266 Water Status</h1>
+  <div id="status" class="status">Loading...</div>
 
+  <script>
+    const dbUrl = "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com/sensor/water.json";
+
+    async function refresh() {
+      try {
+        const res = await fetch(dbUrl);
+        const data = await res.json();
+        const detected = data && data.detected === true;
+
+        const el = document.getElementById("status");
+        el.textContent = detected ? "WATER DETECTED" : "DRY";
+        el.className = "status " + (detected ? "wet" : "dry");
+      } catch (e) {
+        const el = document.getElementById("status");
+        el.textContent = "Connection error";
+        el.className = "status wet";
+      }
+    }
+
+    refresh();
+    setInterval(refresh, 3000);
+  </script>
+</body>
+</html>
